@@ -14,7 +14,7 @@ Built with React 19, Vite, TypeScript, three.js (react-three-fiber) and zustand.
 
 ## Run it
 
-Requires Node 20+.
+Requires Node 20.19+ (what Vite 8 needs).
 
 ```sh
 cd web
