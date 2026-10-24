@@ -6,7 +6,7 @@ import { useDashboard } from '../../state/store'
 import { loadLayout, type Layout } from '../../data/layout'
 import { PointCloud } from './PointCloud'
 import { ZoneOverlay } from './ZoneOverlay'
-import { RobotIcon } from './RobotMarker'
+import { RobotIcon, GoalPin } from './RobotMarker'
 import { LabelProjector, type MapLabel } from './LabelLayer'
 import './map.css'
 
@@ -54,6 +54,19 @@ function CameraRig({ layout, interactive }: { layout: Layout; interactive: boole
   return interactive ? <MapControls enableRotate={false} screenSpacePanning makeDefault /> : null
 }
 
+// Invisible floor plane: while Quick Goal is armed, a click (not a drag-pan) drops the goal there.
+function GoalPicker() {
+  const armed = useDashboard((s) => s.goalArmed)
+  const setGoal = useDashboard((s) => s.setGoal)
+  if (!armed) return null
+  return (
+    <mesh position={[0, 0, 1]} onClick={(e) => { e.stopPropagation(); setGoal([e.point.x, e.point.y]) }}>
+      <planeGeometry args={[1000, 1000]} />
+      <meshBasicMaterial visible={false} />
+    </mesh>
+  )
+}
+
 export function MapView({ interactive }: { interactive: boolean }) {
   const [layout, setLayout] = useState<Layout | null>(null)
   const els = useRef<(HTMLDivElement | null)[]>([])
@@ -73,6 +86,11 @@ export function MapView({ interactive }: { interactive: boolean }) {
       position: layout.waypoints[0],
       follow: () => { const p = useDashboard.getState().pose; return p ? [p.x, p.y] : null },
       node: <RobotIcon />,
+    }, {
+      id: 'goal',
+      position: [0, 0],
+      follow: () => useDashboard.getState().goal,
+      node: <GoalPin />,
     }]
   }, [layout, interactive])
 
@@ -87,6 +105,7 @@ export function MapView({ interactive }: { interactive: boolean }) {
           <PointCloud />
         </Suspense>
         <ZoneOverlay zones={layout.zones} />
+        {interactive && <GoalPicker />}
         <LabelProjector labels={labels} els={els} />
       </Canvas>
       <div className="map-labels">

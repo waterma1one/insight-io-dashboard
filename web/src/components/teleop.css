@@ -8,3 +8,6 @@
 .pad__arrow--up { top: 2px; left: 50%; transform: translateX(-50%); } .pad__arrow--down { bottom: 2px; left: 50%; transform: translateX(-50%); }
 .pad__arrow--left { left: 2px; top: 50%; transform: translateY(-50%); } .pad__arrow--right { right: 2px; top: 50%; transform: translateY(-50%); }
 .pad__arrow:active { color: var(--estop-yellow); }
+
+.pad.is-off { opacity: 0.45; }
+.pad.is-off button { cursor: not-allowed; }

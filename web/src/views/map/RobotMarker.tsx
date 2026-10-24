@@ -7,3 +7,12 @@ export function RobotIcon() {
     </svg>
   )
 }
+
+export function GoalPin() {
+  return (
+    <svg className="goal-pin" width="26" height="30" viewBox="0 0 24 28" aria-label="Goal">
+      <path d="M12 27C12 27 3 17 3 10a9 9 0 0118 0c0 7-9 17-9 17z" fill="#e0457b" stroke="#fff" strokeWidth="1.5" />
+      <circle cx="12" cy="10" r="3.2" fill="#fff" />
+    </svg>
+  )
+}

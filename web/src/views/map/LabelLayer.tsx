@@ -13,7 +13,10 @@ export function LabelProjector({ labels, els }: { labels: MapLabel[]; els: Mutab
     labels.forEach((l, i) => {
       const el = els.current[i]
       if (!el) return
-      const [x, y] = l.follow?.() ?? l.position
+      const at = l.follow ? l.follow() : l.position
+      el.style.display = at ? '' : 'none'
+      if (!at) return
+      const [x, y] = at
       v.set(x, y, 0).project(camera)
       el.style.transform = `translate(${(v.x * 0.5 + 0.5) * size.width}px, ${(-v.y * 0.5 + 0.5) * size.height}px) translate(-50%, -50%)`
     })

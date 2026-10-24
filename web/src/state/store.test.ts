@@ -20,4 +20,18 @@ describe('dashboard store', () => {
     useDashboard.getState().togglePaused()
     expect(useDashboard.getState().paused).toBe(true)
   })
+  it('arms quick goal and disarms once a goal is placed', () => {
+    useDashboard.setState({ goal: null, goalArmed: false })
+    useDashboard.getState().toggleGoalArmed()
+    expect(useDashboard.getState().goalArmed).toBe(true)
+    useDashboard.getState().setGoal([3, 4])
+    expect(useDashboard.getState().goal).toEqual([3, 4])
+    expect(useDashboard.getState().goalArmed).toBe(false)
+  })
+  it('initiate resumes in auto mode', () => {
+    useDashboard.setState({ mode: 'manual', paused: true })
+    useDashboard.getState().initiate()
+    expect(useDashboard.getState().mode).toBe('auto')
+    expect(useDashboard.getState().paused).toBe(false)
+  })
 })

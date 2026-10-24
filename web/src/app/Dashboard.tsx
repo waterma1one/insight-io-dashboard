@@ -18,6 +18,9 @@ export function Dashboard() {
   useRobotSource()
   const mainView = useDashboard((s) => s.mainView)
   const swapView = useDashboard((s) => s.swapView)
+  const goalArmed = useDashboard((s) => s.goalArmed)
+  const toggleGoalArmed = useDashboard((s) => s.toggleGoalArmed)
+  const initiate = useDashboard((s) => s.initiate)
   const other = mainView === 'map' ? 'camera' : 'map'
   return (
     <div className="dash">
@@ -27,9 +30,9 @@ export function Dashboard() {
       <div className={`slot slot--${mainView === 'camera' ? 'stage' : 'pip'}`} data-view="camera"><CameraView /></div>
       <button className="pip-hit" onClick={swapView} aria-label={`Enter ${other} view`}><span>Click to enter {other} view</span></button>
 
-      <div className="hud hud--tl"><StatusPill /><PillButton label="Quick goal" /></div>
+      <div className="hud hud--tl"><StatusPill /><PillButton label={goalArmed ? 'Click map…' : 'Quick goal'} onClick={toggleGoalArmed} /></div>
       <TelemetryBar label={LABEL[mainView]} />
-      <div className="hud hud--tr"><ModeToggle /><PillButton label="Initiate" /></div>
+      <div className="hud hud--tr"><ModeToggle /><PillButton label="Initiate" onClick={initiate} /></div>
       <div className="hud hud--bl"><ZoomSlider /></div>
       <div className="hud hud--br"><EmergencyStop /><TeleopPad /></div>
     </div>
