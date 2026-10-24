@@ -15,6 +15,7 @@ class FakeSocket {
   send(data: string) { this.sent.push(JSON.parse(data)) }
   close() { this.onclose?.() }
   receive(msg: object) { this.onmessage?.({ data: JSON.stringify({ op: 'publish', ...msg }) }) }
+  autoFlags() { return this.sent.filter((m) => m.topic === '/auto_drive' && m.op === 'publish').map((m) => m.msg.data) }
   twists() { return this.sent.filter((m) => m.op === 'publish' && m.topic === '/cmd_vel') }
 }
 
@@ -38,17 +39,17 @@ describe('RosSource', () => {
 
   it('subscribes to odometry and battery and advertises cmd_vel', () => {
     const topics = FakeSocket.last.sent.map((m) => `${m.op}:${m.topic}`)
-    expect(topics).toEqual(['subscribe:/odom', 'subscribe:/battery_state', 'advertise:/cmd_vel'])
+    expect(topics).toEqual(['subscribe:/odom', 'subscribe:/battery_state', 'advertise:/cmd_vel', 'advertise:/auto_drive'])
   })
 
   it('maps odometry to pose and battery 0..1 to percent', () => {
-    FakeSocket.last.receive({ topic: '/battery_state', msg: { percentage: 0.8 } })
+    FakeSocket.last.receive({ topic: '/battery_state', msg: { percentage: 0.8004 } })
     FakeSocket.last.receive(odom(3, -2, Math.PI / 2))
     const { pose, telemetry } = seen.at(-1)!
     expect(pose.x).toBe(3)
     expect(pose.y).toBe(-2)
     expect(pose.heading).toBeCloseTo(Math.PI / 2)
-    expect(telemetry.battery).toBeCloseTo(80)
+    expect(telemetry.battery).toBe(80)
     expect(telemetry.signal).toBe('Strong')
   })
 
@@ -58,9 +59,36 @@ describe('RosSource', () => {
     expect(seen.at(-1)!.telemetry.signal).toBe('Lost')
   })
 
-  it('stays silent in AUTO so the robot navigates itself', () => {
-    vi.advanceTimersByTime(500)
+  it('emits nothing until the first odometry arrives', () => {
+    vi.advanceTimersByTime(1000)
+    expect(seen).toHaveLength(0)
+  })
+
+  it('ignores an unknown battery and malformed frames', () => {
+    FakeSocket.last.receive(odom(0, 0, 0))
+    FakeSocket.last.receive({ topic: '/battery_state', msg: { percentage: 0.5 } })
+    FakeSocket.last.receive({ topic: '/battery_state', msg: { percentage: null } })
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    FakeSocket.last.onmessage?.({ data: 'not json' })
+    FakeSocket.last.receive({ topic: '/odom', msg: {} })
+    FakeSocket.last.receive(odom(1, 1, 0))
+    expect(seen.at(-1)!.telemetry.battery).toBe(50)
+    expect(seen.at(-1)!.pose.x).toBe(1)
+  })
+
+  it('heartbeats auto_drive true and sends no twist in AUTO', () => {
+    vi.advanceTimersByTime(300)
+    expect(FakeSocket.last.autoFlags()).toEqual([true, true, true])
     expect(FakeSocket.last.twists()).toHaveLength(0)
+  })
+
+  it('latches auto_drive false while paused or in MANUAL', () => {
+    source.setPaused(true)
+    vi.advanceTimersByTime(100)
+    source.setPaused(false)
+    source.setManual(true)
+    vi.advanceTimersByTime(100)
+    expect(FakeSocket.last.autoFlags()).toEqual([false, false])
   })
 
   it('publishes the scaled drive command in MANUAL', () => {

@@ -52,10 +52,12 @@ VITE_ROBOT_SOURCE=ros npm run dev  # VITE_ROSBRIDGE_URL overrides the default ws
 | --- | --- | --- | --- |
 | `/odom` | robot to dashboard | `nav_msgs/Odometry` | pose and heading; staleness drives the signal indicator |
 | `/battery_state` | robot to dashboard | `sensor_msgs/BatteryState` | battery (`percentage` is 0..1) |
-| `/cmd_vel` | dashboard to robot | `geometry_msgs/Twist` | MANUAL drive, and zero velocity while paused |
+| `/auto_drive` | dashboard to robot | `std_msgs/Bool` | heartbeat, true only while running in AUTO |
+| `/cmd_vel` | dashboard to robot | `geometry_msgs/Twist` | MANUAL drive, and zero velocity while paused (sent whenever `/auto_drive` is false) |
 
-In AUTO the dashboard publishes nothing, so the robot's own navigation drives. The bundled sim
-(`ros/sim_robot/sim_robot.py`) loops the same waypoints and treats a recent `/cmd_vel` as manual control.
+The robot should latch `/auto_drive`, so a pause or e-stop still holds if the dashboard stalls or disconnects. The
+bundled sim (`ros/sim_robot/sim_robot.py`) does this: it follows the route while the flag is true, drives from
+`/cmd_vel` while it is false (a stale command counts as zero), and rejoins the route at the nearest point.
 
 ## How it is built
 

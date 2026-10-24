@@ -4,9 +4,10 @@
 Publishes /odom (nav_msgs/Odometry) and /battery_state (sensor_msgs/BatteryState) and
 subscribes to /cmd_vel (geometry_msgs/Twist).
 
-Without a recent /cmd_vel message the robot loops along layout.json's waypoints (AUTO).
-While /cmd_vel keeps arriving (the dashboard sends it in MANUAL and when paused) the robot
-integrates the command instead; a zero command holds it still.
+/auto_drive (std_msgs/Bool) is latched: while true the robot loops along layout.json's
+waypoints (AUTO); while false it integrates /cmd_vel instead (the dashboard sends zeros when
+paused). A /cmd_vel older than CMD_TIMEOUT counts as zero, so a stalled dashboard stops the
+robot rather than leaving it driving. Leaving manual rejoins the route at the nearest point.
 """
 import json
 import math
@@ -17,10 +18,11 @@ from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from rclpy.node import Node
 from sensor_msgs.msg import BatteryState
+from std_msgs.msg import Bool
 
 RATE_HZ = 30.0
 AUTO_SPEED = 1.2  # m/s along the waypoint loop
-CMD_TIMEOUT = 0.5  # s without /cmd_vel before AUTO resumes
+CMD_TIMEOUT = 0.5  # s without /cmd_vel before the command counts as zero
 DRAIN_PER_SEC = 0.05  # battery % lost per second of motion
 
 
@@ -36,16 +38,20 @@ class SimRobot(Node):
             for i, p in enumerate(self.waypoints)
         ]
         self.total = sum(self.seg)
+        if self.total <= 0:
+            raise ValueError('layout.json waypoints must span a non-zero distance')
         self.dist = 0.0
         self.battery = 100.0
         self.x, self.y = self.waypoints[0]
         self.heading = 0.0
         self.cmd = Twist()
         self.cmd_at = -1e9
+        self.auto = True  # latched from /auto_drive; true so the sim also runs standalone
 
         self.odom_pub = self.create_publisher(Odometry, "odom", 10)
         self.battery_pub = self.create_publisher(BatteryState, "battery_state", 10)
         self.create_subscription(Twist, "cmd_vel", self.on_cmd, 10)
+        self.create_subscription(Bool, "auto_drive", self.on_auto, 10)
         self.last = self.now()
         self.create_timer(1.0 / RATE_HZ, self.tick)
 
@@ -56,30 +62,49 @@ class SimRobot(Node):
         self.cmd = msg
         self.cmd_at = self.now()
 
-    def manual(self, now):
-        return now - self.cmd_at < CMD_TIMEOUT
+    def on_auto(self, msg):
+        if msg.data and not self.auto:
+            self.rejoin_route()
+        self.auto = msg.data
 
     def tick(self):
         now = self.now()
         dt, self.last = now - self.last, now
-        if self.manual(now):
-            self.drive(dt)
-        else:
+        if self.auto:
             self.follow_route(dt)
+        else:
+            self.drive(dt, fresh=now - self.cmd_at < CMD_TIMEOUT)
         self.publish()
 
-    def drive(self, dt):
-        self.heading += self.cmd.angular.z * dt
-        self.x = min(self.bounds["maxX"], max(self.bounds["minX"], self.x + math.cos(self.heading) * self.cmd.linear.x * dt))
-        self.y = min(self.bounds["maxY"], max(self.bounds["minY"], self.y + math.sin(self.heading) * self.cmd.linear.x * dt))
-        if self.cmd.linear.x:
+    def drive(self, dt, fresh):
+        linear = self.cmd.linear.x if fresh else 0.0
+        angular = self.cmd.angular.z if fresh else 0.0
+        self.heading += angular * dt
+        self.x = min(self.bounds["maxX"], max(self.bounds["minX"], self.x + math.cos(self.heading) * linear * dt))
+        self.y = min(self.bounds["maxY"], max(self.bounds["minY"], self.y + math.sin(self.heading) * linear * dt))
+        if linear:
             self.battery = max(0.0, self.battery - DRAIN_PER_SEC * dt)
+
+    def rejoin_route(self):
+        """Continue the loop from the route point nearest to where manual driving ended."""
+        best, run = math.inf, 0.0
+        for i, length in enumerate(self.seg):
+            a, b = self.waypoints[i], self.waypoints[(i + 1) % len(self.waypoints)]
+            t = 0.0
+            if length:
+                t = ((self.x - a[0]) * (b[0] - a[0]) + (self.y - a[1]) * (b[1] - a[1])) / (length * length)
+                t = min(1.0, max(0.0, t))
+            d = math.hypot(a[0] + (b[0] - a[0]) * t - self.x, a[1] + (b[1] - a[1]) * t - self.y)
+            if d < best:
+                best, self.dist = d, run + t * length
+            run += length
 
     def follow_route(self, dt):
         self.dist = (self.dist + AUTO_SPEED * dt) % self.total
         d = self.dist
+        last = len(self.seg) - 1
         for i, length in enumerate(self.seg):
-            if d <= length:
+            if d <= length or i == last:
                 a, b = self.waypoints[i], self.waypoints[(i + 1) % len(self.waypoints)]
                 t = d / length if length else 0.0
                 self.x, self.y = a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t
