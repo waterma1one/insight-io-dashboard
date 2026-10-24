@@ -2,7 +2,7 @@ import { useFrame } from '@react-three/fiber'
 import { Vector3 } from 'three'
 import type { MutableRefObject, ReactNode } from 'react'
 
-export interface MapLabel { id: string; position: [number, number]; node: ReactNode }
+export interface MapLabel { id: string; position: [number, number]; follow?: () => [number, number] | null; node: ReactNode }
 
 const v = new Vector3()
 
@@ -13,7 +13,8 @@ export function LabelProjector({ labels, els }: { labels: MapLabel[]; els: Mutab
     labels.forEach((l, i) => {
       const el = els.current[i]
       if (!el) return
-      v.set(l.position[0], l.position[1], 0).project(camera)
+      const [x, y] = l.follow?.() ?? l.position
+      v.set(x, y, 0).project(camera)
       el.style.transform = `translate(${(v.x * 0.5 + 0.5) * size.width}px, ${(-v.y * 0.5 + 0.5) * size.height}px) translate(-50%, -50%)`
     })
   })

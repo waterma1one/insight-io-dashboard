@@ -68,7 +68,12 @@ export function MapView({ interactive }: { interactive: boolean }) {
           node: <span className="zone-label">{z.name}</span>,
         }))
       : []
-    return [...zoneLabels, { id: 'robot', position: layout.waypoints[0], node: <RobotIcon /> }]
+    return [...zoneLabels, {
+      id: 'robot',
+      position: layout.waypoints[0],
+      follow: () => { const p = useDashboard.getState().pose; return p ? [p.x, p.y] : null },
+      node: <RobotIcon />,
+    }]
   }, [layout, interactive])
 
   if (!layout) return <div className="map-loading">Loading map…</div>

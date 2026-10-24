@@ -9,11 +9,13 @@ import { TeleopPad } from '../components/TeleopPad'
 import { ZoomSlider } from '../components/ZoomSlider'
 import { MapView } from '../views/map/MapView'
 import { CameraView } from '../views/camera/CameraView'
+import { useRobotSource } from '../hooks/useRobotSource'
 import './dashboard.css'
 
 const LABEL = { map: 'Map View', camera: 'Camera View' } as const
 
 export function Dashboard() {
+  useRobotSource()
   const mainView = useDashboard((s) => s.mainView)
   const swapView = useDashboard((s) => s.swapView)
   const other = mainView === 'map' ? 'camera' : 'map'

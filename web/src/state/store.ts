@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import type { Pose, Telemetry } from '../data/source'
 
 export type ViewId = 'map' | 'camera'
 export type Mode = 'auto' | 'manual'
@@ -8,6 +9,9 @@ interface DashboardState {
   mode: Mode
   paused: boolean
   zoom: number
+  pose: Pose | null
+  telemetry: Telemetry
+  setSnapshot: (pose: Pose, telemetry: Telemetry) => void
   setMode: (mode: Mode) => void
   togglePaused: () => void
   setZoom: (zoom: number) => void
@@ -19,6 +23,14 @@ export const useDashboard = create<DashboardState>((set) => ({
   mode: 'auto',
   paused: false,
   zoom: 0.2,
+  pose: null,
+  telemetry: { battery: 100, signal: 'Strong', failsafe: 'Okay', system: 'Okay' },
+  // Pose arrives every frame; keep the old telemetry object unless a field changed so its subscribers stay quiet.
+  setSnapshot: (pose, telemetry) =>
+    set((s) => ({
+      pose,
+      telemetry: (Object.keys(telemetry) as (keyof Telemetry)[]).every((k) => s.telemetry[k] === telemetry[k]) ? s.telemetry : telemetry,
+    })),
   setMode: (mode) => set({ mode }),
   togglePaused: () => set((s) => ({ paused: !s.paused })),
   setZoom: (zoom) => set({ zoom: Math.min(1, Math.max(0, zoom)) }),
