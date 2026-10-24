@@ -105,7 +105,7 @@ export function MapView({ interactive }: { interactive: boolean }) {
 
   return (
     <div className={`map ${interactive ? 'map--live' : ''}`}>
-      <Canvas orthographic camera={{ position: [0, 0, 50], zoom: 20, near: 0.1, far: 200 }} gl={{ antialias: true }}>
+      <Canvas orthographic resize={{ debounce: 0, scroll: false }} camera={{ position: [0, 0, 50], zoom: 20, near: 0.1, far: 200 }} gl={{ antialias: true }}>
         <color attach="background" args={['#d4d4d2']} />
         <CameraRig layout={layout} interactive={interactive} />
         <Suspense fallback={null}>
