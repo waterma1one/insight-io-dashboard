@@ -1,0 +1,22 @@
+# Optional ROS 2 backend: rosbridge on ws://localhost:9090 plus a simulated robot.
+# Run the dashboard against it with:  VITE_ROBOT_SOURCE=ros npm run dev   (in web/)
+services:
+  rosbridge:
+    build: ./ros
+    ports:
+      - "9090:9090"
+    command: >
+      bash -c "source /opt/ros/humble/setup.bash &&
+      ros2 launch rosbridge_server rosbridge_websocket_launch.xml"
+
+  sim:
+    build: ./ros
+    depends_on:
+      - rosbridge
+    environment:
+      LAYOUT: /data/layout.json
+    volumes:
+      - ./web/public/assets/layout.json:/data/layout.json:ro
+    command: >
+      bash -c "source /opt/ros/humble/setup.bash &&
+      python3 /opt/sim_robot.py"
