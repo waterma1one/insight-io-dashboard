@@ -8,6 +8,15 @@ export function RobotIcon() {
   )
 }
 
+// Arrow drawn pointing along +x; LabelProjector rotates it to the robot's heading.
+export function HeadingArrow() {
+  return (
+    <svg className="heading" width="44" height="44" viewBox="-22 -22 44 44" aria-hidden="true">
+      <path d="M13 -6 L22 0 L13 6 Z" fill="#e0457b" stroke="#fff" strokeWidth="1.5" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 export function GoalPin() {
   return (
     <svg className="goal-pin" width="26" height="30" viewBox="0 0 24 28" aria-label="Goal">

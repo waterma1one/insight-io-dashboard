@@ -6,7 +6,7 @@ import { useDashboard } from '../../state/store'
 import { loadLayout, type Layout } from '../../data/layout'
 import { PointCloud } from './PointCloud'
 import { ZoneOverlay } from './ZoneOverlay'
-import { RobotIcon, GoalPin } from './RobotMarker'
+import { RobotIcon, HeadingArrow, GoalPin } from './RobotMarker'
 import { LabelProjector, type MapLabel } from './LabelLayer'
 import './map.css'
 
@@ -81,10 +81,17 @@ export function MapView({ interactive }: { interactive: boolean }) {
           node: <span className="zone-label">{z.name}</span>,
         }))
       : []
+    const robotAt = () => { const p = useDashboard.getState().pose; return p ? [p.x, p.y] as [number, number] : null }
     return [...zoneLabels, {
+      id: 'heading',
+      position: layout.waypoints[0],
+      follow: robotAt,
+      angle: () => useDashboard.getState().pose?.heading ?? 0,
+      node: <HeadingArrow />,
+    }, {
       id: 'robot',
       position: layout.waypoints[0],
-      follow: () => { const p = useDashboard.getState().pose; return p ? [p.x, p.y] : null },
+      follow: robotAt,
       node: <RobotIcon />,
     }, {
       id: 'goal',

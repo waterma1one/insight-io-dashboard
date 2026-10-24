@@ -6,3 +6,4 @@
 .map-labels { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .map-label { position: absolute; left: 0; top: 0; will-change: transform; }
 .map:not(.map--live) .robot { width: 10px; height: 10px; }
+.map:not(.map--live) .heading { display: none; }
