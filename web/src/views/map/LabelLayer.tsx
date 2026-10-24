@@ -1,0 +1,21 @@
+import { useFrame } from '@react-three/fiber'
+import { Vector3 } from 'three'
+import type { MutableRefObject, ReactNode } from 'react'
+
+export interface MapLabel { id: string; position: [number, number]; node: ReactNode }
+
+const v = new Vector3()
+
+// Lives inside <Canvas>: each frame, projects label world positions to screen space and moves
+// the matching DOM node. Labels are plain DOM so they need no extra React roots (unlike drei <Html>).
+export function LabelProjector({ labels, els }: { labels: MapLabel[]; els: MutableRefObject<(HTMLDivElement | null)[]> }) {
+  useFrame(({ camera, size }) => {
+    labels.forEach((l, i) => {
+      const el = els.current[i]
+      if (!el) return
+      v.set(l.position[0], l.position[1], 0).project(camera)
+      el.style.transform = `translate(${(v.x * 0.5 + 0.5) * size.width}px, ${(-v.y * 0.5 + 0.5) * size.height}px) translate(-50%, -50%)`
+    })
+  })
+  return null
+}

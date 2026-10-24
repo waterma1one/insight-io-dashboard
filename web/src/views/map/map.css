@@ -1,0 +1,8 @@
+.map, .map-loading { position: absolute; inset: 0; }
+.map-loading { display: grid; place-items: center; color: var(--muted); }
+.map--live { cursor: grab; }
+.map--live:active { cursor: grabbing; }
+.zone-label { font-size: 8px; color: #b23a44; white-space: nowrap; font-weight: 500; letter-spacing: .02em; }
+.map-labels { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.map-label { position: absolute; left: 0; top: 0; will-change: transform; }
+.map:not(.map--live) .robot { width: 10px; height: 10px; }

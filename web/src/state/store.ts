@@ -18,7 +18,7 @@ export const useDashboard = create<DashboardState>((set) => ({
   mainView: 'map',
   mode: 'auto',
   paused: false,
-  zoom: 0.5,
+  zoom: 0.2,
   setMode: (mode) => set({ mode }),
   togglePaused: () => set((s) => ({ paused: !s.paused })),
   setZoom: (zoom) => set({ zoom: Math.min(1, Math.max(0, zoom)) }),
