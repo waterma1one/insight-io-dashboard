@@ -32,4 +32,13 @@ describe('StaticSource', () => {
     const seen = run(s, [1000, 2000]) as { pose: { x: number } }[]
     expect(seen[1].pose.x).toBe(0)
   })
+
+  it('does not drive in MANUAL while paused', () => {
+    const s = new StaticSource(layout)
+    s.setManual(true)
+    s.setCommand({ linear: 1, angular: 0 })
+    s.setPaused(true)
+    const seen = run(s, [1000, 2000]) as { pose: { x: number } }[]
+    expect(seen[1].pose.x).toBe(0)
+  })
 })

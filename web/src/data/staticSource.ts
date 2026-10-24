@@ -36,7 +36,7 @@ export class StaticSource implements RobotSource {
       const dt = (now - this.last) / 1000
       this.last = now
       if (this.manual) {
-        this.drive(dt)
+        if (!this.paused) this.drive(dt)
       } else if (!this.paused) {
         this.dist = (this.dist + SPEED * dt) % this.total
         this.battery = Math.max(0, this.battery - DRAIN_PER_SEC * dt)
@@ -90,7 +90,7 @@ export class StaticSource implements RobotSource {
     const pts = this.layout.waypoints
     let d = this.dist
     let i = 0
-    while (d > this.segLen[i]) d -= this.segLen[i++]
+    while (i < pts.length - 1 && d > this.segLen[i]) d -= this.segLen[i++]
     const a = pts[i]
     const b = pts[(i + 1) % pts.length]
     const t = this.segLen[i] ? d / this.segLen[i] : 0
