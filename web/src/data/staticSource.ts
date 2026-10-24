@@ -5,6 +5,7 @@ const SPEED = 1.2 // m/s along the waypoint loop
 const MANUAL_LINEAR = 1.8 // m/s at full stick
 const MANUAL_ANGULAR = 2 // rad/s at full stick
 const DRAIN_PER_SEC = 0.05 // battery % lost per second of motion
+const RECHARGE_BELOW = 20 // mock dock visit: refill to 100 % so a long demo never reads empty
 
 // Replays the robot along layout.waypoints in a closed loop, with slowly draining mock telemetry.
 export class StaticSource implements RobotSource {
@@ -39,7 +40,7 @@ export class StaticSource implements RobotSource {
         if (!this.paused) this.drive(dt)
       } else if (!this.paused) {
         this.dist = (this.dist + SPEED * dt) % this.total
-        this.battery = Math.max(0, this.battery - DRAIN_PER_SEC * dt)
+        this.drain(dt)
       }
       onUpdate(this.snapshot())
       this.raf = requestAnimationFrame(tick)
@@ -65,7 +66,12 @@ export class StaticSource implements RobotSource {
     f.heading += this.cmd.angular * MANUAL_ANGULAR * dt
     f.x = Math.min(bounds.maxX, Math.max(bounds.minX, f.x + Math.cos(f.heading) * this.cmd.linear * MANUAL_LINEAR * dt))
     f.y = Math.min(bounds.maxY, Math.max(bounds.minY, f.y + Math.sin(f.heading) * this.cmd.linear * MANUAL_LINEAR * dt))
-    if (this.cmd.linear !== 0) this.battery = Math.max(0, this.battery - DRAIN_PER_SEC * dt)
+    if (this.cmd.linear !== 0) this.drain(dt)
+  }
+
+  private drain(dt: number) {
+    this.battery -= DRAIN_PER_SEC * dt
+    if (this.battery < RECHARGE_BELOW) this.battery = 100
   }
 
   // Back in AUTO: resume the loop from the route point nearest to where manual driving ended.

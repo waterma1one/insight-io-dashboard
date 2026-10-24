@@ -41,4 +41,11 @@ describe('StaticSource', () => {
     const seen = run(s, [1000, 2000]) as { pose: { x: number } }[]
     expect(seen[1].pose.x).toBe(0)
   })
+
+  it('recharges instead of draining to empty', () => {
+    const s = new StaticSource(layout)
+    ;(s as unknown as { battery: number }).battery = 20.01
+    const seen = run(s, [1000]) as { telemetry: { battery: number } }[]
+    expect(seen[0].telemetry.battery).toBe(100)
+  })
 })
