@@ -4,6 +4,8 @@ A self-hosted rebuild of ERIC Robotics' `Insight.IO` robot-ops dashboard: a live
 that swap between a main stage and a picture-in-picture, with mission controls, teleop, and an emergency stop.
 Built with React 19, Vite, TypeScript, three.js (react-three-fiber) and zustand.
 
+**Submitted by:** Aditya Singh · blusinghaditya@gmail.com · +91 8429822261 · GitHub [@waterma1one](https://github.com/waterma1one)
+
 | Desktop (map main) | Desktop (camera main) |
 | --- | --- |
 | ![Map view](docs/screenshots/desktop-1440.png) | ![Camera view](docs/screenshots/camera-1440.png) |
