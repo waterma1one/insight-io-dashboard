@@ -1,0 +1,8 @@
+.pill {
+  display: inline-flex; align-items: center; gap: 10px;
+  height: 28px; padding: 0 3px 0 12px;
+  background: var(--paper); border-radius: var(--radius-pill);
+  box-shadow: var(--pill-shadow);
+}
+.pill--action { justify-content: space-between; min-width: 78px; font-size: 9px; letter-spacing: .06em; text-transform: uppercase; }
+.pill__dot { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: #fff; }

@@ -1,0 +1,7 @@
+.mode { padding: 3px 3px 3px 12px; gap: 12px; font-size: 8px; text-transform: uppercase; letter-spacing: .06em; }
+.mode__seg { display: flex; background: #e8e9eb; border-radius: var(--radius-pill); }
+.mode__seg button { padding: 5px 12px; border-radius: var(--radius-pill); font-size: 8px; text-transform: uppercase; letter-spacing: .06em; transition: background .2s, color .2s; }
+.mode__seg .is-on { background: var(--ink); color: #fff; }
+.status { padding: 3px 3px 3px 12px; font-size: 8px; gap: 8px; min-width: 150px; }
+.status__k { color: var(--muted); }
+.status__v { flex: 1; font-weight: 600; }

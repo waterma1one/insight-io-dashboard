@@ -1,0 +1,10 @@
+.pad { position: relative; width: 82px; height: 82px; border-radius: 50%; background: radial-gradient(circle, var(--navy-700), var(--ink)); color: #fff; box-shadow: var(--pill-shadow); }
+.pad__core { position: absolute; inset: 20px; border-radius: 50%; background: #fff; color: var(--ink); display: grid; place-items: center; font-size: 6px; font-weight: 600; }
+.k { position: absolute; }
+.k-w { top: 4px; left: 50%; transform: translateX(-50%); } .k-s { bottom: 4px; left: 50%; transform: translateX(-50%); }
+.k-a { left: 4px; top: 50%; transform: translateY(-50%); } .k-d { right: 4px; top: 50%; transform: translateY(-50%); }
+.pad__hint { font-size: 4.5px; font-weight: 400; text-align: center; width: 14px; line-height: 1.2; }
+.pad__arrow { position: absolute; display: grid; place-items: center; width: 14px; height: 14px; }
+.pad__arrow--up { top: 2px; left: 50%; transform: translateX(-50%); } .pad__arrow--down { bottom: 2px; left: 50%; transform: translateX(-50%); }
+.pad__arrow--left { left: 2px; top: 50%; transform: translateY(-50%); } .pad__arrow--right { right: 2px; top: 50%; transform: translateY(-50%); }
+.pad__arrow:active { color: var(--estop-yellow); }

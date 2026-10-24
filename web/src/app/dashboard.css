@@ -1,0 +1,11 @@
+.dash { position: relative; height: 100%; padding-left: var(--nav-w); background: var(--stage-bg); }
+.hud { position: absolute; z-index: 5; display: flex; gap: 8px; }
+.hud--tl { top: 8px; left: calc(var(--nav-w) + 22px); flex-direction: column; align-items: flex-start; }
+.hud--tr { top: 8px; right: 22px; flex-direction: column; align-items: flex-end; }
+.hud--bl { bottom: 34px; left: calc(var(--nav-w) + 22px); align-items: flex-end; }
+.hud--br { bottom: 34px; right: 22px; flex-direction: column; align-items: center; gap: 22px; }
+.slot { position: absolute; overflow: hidden; transition: all .5s cubic-bezier(.4, 0, .2, 1); display: grid; place-items: center; color: var(--muted); }
+.slot--stage { inset: 0 0 0 var(--nav-w); z-index: 1; border-radius: 0; }
+.slot--pip { z-index: 4; left: calc(var(--nav-w) + 50px); bottom: 34px; width: 172px; height: 100px; inset: auto auto 34px calc(var(--nav-w) + 50px); border-radius: 10px; background: #e6e6e6; }
+.pip-hit { position: absolute; z-index: 6; left: calc(var(--nav-w) + 50px); bottom: 34px; width: 172px; height: 100px; border-radius: 10px; color: transparent; font-size: 8px; transition: background .2s, color .2s; }
+.pip-hit:hover, .pip-hit:focus-visible { background: rgb(255 255 255 / .35); color: #fff; }

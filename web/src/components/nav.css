@@ -1,0 +1,7 @@
+.nav { position: absolute; inset: 0 auto 0 0; width: var(--nav-w); z-index: 6; display: flex; flex-direction: column; align-items: center; padding: 8px 0 14px; background: linear-gradient(180deg, var(--navy-700), var(--navy-900)); color: #9aa6b8; }
+.nav__logo { color: #fff; font-weight: 800; font-size: 14px; line-height: 1; text-align: center; }
+.nav__logo small { display: block; font-size: 3.5px; letter-spacing: .25em; margin-top: 1px; }
+.nav ul { list-style: none; margin: 34px 0 0; padding: 0; display: flex; flex-direction: column; gap: 22px; flex: 1; }
+.nav button { color: inherit; display: grid; place-items: center; }
+.nav .is-active { color: #fff; }
+.nav button:hover { color: #fff; }
