@@ -1,21 +1,31 @@
 import { useEffect, useRef } from 'react'
 import { loadLayout } from '../data/layout'
+import { RosSource } from '../data/rosSource'
+import type { RobotSource } from '../data/source'
 import { StaticSource } from '../data/staticSource'
 import { useDashboard } from '../state/store'
+
+// VITE_ROBOT_SOURCE=ros streams from rosbridge (VITE_ROSBRIDGE_URL); anything else replays the static route.
+async function createSource(): Promise<RobotSource> {
+  if (import.meta.env.VITE_ROBOT_SOURCE === 'ros') {
+    return new RosSource(import.meta.env.VITE_ROSBRIDGE_URL ?? 'ws://localhost:9090')
+  }
+  return new StaticSource(await loadLayout())
+}
 
 // Starts the robot data source and mirrors its snapshots (and the pause flag) into the store.
 export function useRobotSource() {
   const paused = useDashboard((s) => s.paused)
   const manual = useDashboard((s) => s.mode === 'manual')
   const command = useDashboard((s) => s.command)
-  const sourceRef = useRef<StaticSource>(undefined)
+  const sourceRef = useRef<RobotSource>(undefined)
 
   useEffect(() => {
-    let source: StaticSource | undefined
+    let source: RobotSource | undefined
     let cancelled = false
-    loadLayout().then((layout) => {
+    createSource().then((created) => {
       if (cancelled) return
-      source = new StaticSource(layout)
+      source = created
       const st = useDashboard.getState()
       source.setPaused(st.paused)
       source.setManual(st.mode === 'manual')
