@@ -12,6 +12,7 @@ import { CameraView } from '../views/camera/CameraView'
 import { useRobotSource } from '../hooks/useRobotSource'
 import { useTeleop } from '../hooks/useTeleop'
 import './dashboard.css'
+import '../styles/responsive.css'
 
 const LABEL = { map: 'Map View', camera: 'Camera View' } as const
 

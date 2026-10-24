@@ -1,0 +1,59 @@
+/*
+ * The overlay UI is drawn at the demo's 800x450 size. --ui scales it up on larger screens; HUD groups
+ * scale with transform from their anchored corner, so their offsets never move. Loaded after the
+ * component css so these rules win.
+ */
+:root { --ui: 1; --nav-w: calc(42px * var(--ui)); --nav-h: 0px; }
+@media (min-width: 1024px) { :root { --ui: 1.25; } }
+@media (min-width: 1280px) { :root { --ui: 1.5; } }
+@media (min-width: 1600px) { :root { --ui: 1.9; } }
+
+.nav > * { zoom: var(--ui); }
+.hud--tl { transform-origin: top left; }
+.hud--tr { transform-origin: top right; }
+.hud--bl { transform-origin: bottom left; }
+.hud--br { transform-origin: bottom right; }
+.hud { transform: scale(var(--ui)); }
+.telemetry { transform: translateX(-50%) scale(var(--ui)); transform-origin: top center; }
+
+.slot--pip, .pip-hit { width: calc(172px * var(--ui)); height: calc(100px * var(--ui)); left: calc(var(--nav-w) + 50px * var(--ui)); top: calc(100% - 34px - 100px * var(--ui)); }
+.pip-hit span { font-size: calc(7px * var(--ui)); }
+
+.pad { touch-action: none; user-select: none; -webkit-user-select: none; }
+.pad__arrow { touch-action: none; }
+
+/* Short landscape screens: tuck the HUD closer to the edges. */
+@media (max-height: 500px) and (min-width: 769px) {
+  .hud--bl, .hud--br { bottom: 14px; }
+  .slot--pip, .pip-hit { top: calc(100% - 14px - 100px * var(--ui)); }
+}
+
+/* Tablet and phone: nav becomes a bottom bar, controls reflow around it. */
+@media (max-width: 768px) {
+  :root { --ui: 1.15; --nav-w: 0px; --nav-h: 48px; }
+  .nav { inset: auto 0 0 0; width: 100%; height: var(--nav-h); flex-direction: row; align-items: center; justify-content: space-between; padding: 0 14px; }
+  .nav > * { zoom: 1; }
+  .nav__logo small { display: none; }
+  .nav ul { margin: 0; flex-direction: row; justify-content: space-around; gap: 0; }
+  .nav ul button { width: 40px; height: 40px; }
+  .nav__user { width: 40px; height: 40px; }
+
+  .slot--stage { height: calc(100% - var(--nav-h)); }
+  .slot--pip, .pip-hit { left: 12px; top: calc(100% - var(--nav-h) - 12px - 76px * var(--ui)); width: calc(128px * var(--ui)); height: calc(76px * var(--ui)); }
+
+  .telemetry__bar { gap: 10px; padding: 8px 12px 10px; }
+  .hud--tl { top: 62px; left: 10px; }
+  .hud--tr { top: 62px; right: 10px; }
+  .hud--bl { left: calc(12px + 128px * var(--ui) + 12px); bottom: calc(var(--nav-h) + 12px); }
+  .hud--br { right: 12px; bottom: calc(var(--nav-h) + 12px); gap: 14px; }
+}
+
+@media (max-width: 420px) {
+  .status { min-width: 0; }
+  .hud--tl, .hud--tr { transform: scale(1); }
+}
+
+/* Touch: make the pad and stop button easier to hit. */
+@media (pointer: coarse) {
+  .hud--br { transform: scale(calc(var(--ui) * 1.25)); }
+}
