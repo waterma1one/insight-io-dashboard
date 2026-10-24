@@ -12,7 +12,7 @@ Built with React 19, Vite, TypeScript, three.js (react-three-fiber) and zustand.
 | --- | --- |
 | ![Tablet](docs/screenshots/tablet-768.png) | ![Phone](docs/screenshots/phone-390.png) |
 
-A short screen recording (AUTO, then MANUAL driving with WASD, back to AUTO) is in [docs/demo.webm](docs/demo.webm).
+A short screen recording (AUTO, MANUAL driving with WASD, back to AUTO, then a map/camera view swap) is in [docs/demo.webm](docs/demo.webm).
 
 ## Run it
 
