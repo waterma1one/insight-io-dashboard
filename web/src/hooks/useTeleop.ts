@@ -16,7 +16,8 @@ export function useTeleop() {
     if (!manual) return
     const onKey = (down: boolean) => (e: KeyboardEvent) => {
       const d = dirForKey(e.key)
-      if (!d || e.metaKey || e.ctrlKey || e.altKey) return
+      if (!d) return
+      if (down && (e.metaKey || e.ctrlKey || e.altKey)) return // shortcuts are not driving; a release must still go through
       if (e.target instanceof HTMLElement && /^(INPUT|TEXTAREA)$/.test(e.target.tagName) && (e.target as HTMLInputElement).type !== 'range') return
       e.preventDefault()
       if (down) press(d); else release(d)
