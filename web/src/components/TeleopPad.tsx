@@ -1,7 +1,7 @@
 import { useDashboard } from '../state/store'
 import './teleop.css'
 
-type Dir = 'up' | 'down' | 'left' | 'right'
+import type { Dir } from '../hooks/teleopCommand'
 const CHEV: Record<Dir, string> = { up: 'M6 14l6-6 6 6', down: 'M6 10l6 6 6-6', left: 'M14 6l-6 6 6 6', right: 'M10 6l6 6-6 6' }
 
 export function TeleopPad({ onPress, onRelease }: { onPress?: (d: Dir) => void; onRelease?: (d: Dir) => void }) {
@@ -16,7 +16,7 @@ export function TeleopPad({ onPress, onRelease }: { onPress?: (d: Dir) => void; 
       ))}
       <div className="pad__core">
         <span className="k k-w">W</span><span className="k k-a">A</span><span className="k k-d">D</span><span className="k k-s">S</span>
-        <span className="pad__hint">⌘ + key</span>
+        <span className="pad__hint">hold key</span>
       </div>
     </div>
   )

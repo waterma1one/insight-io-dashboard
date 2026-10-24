@@ -6,6 +6,8 @@ import { useDashboard } from '../state/store'
 // Starts the robot data source and mirrors its snapshots (and the pause flag) into the store.
 export function useRobotSource() {
   const paused = useDashboard((s) => s.paused)
+  const manual = useDashboard((s) => s.mode === 'manual')
+  const command = useDashboard((s) => s.command)
   const sourceRef = useRef<StaticSource>(undefined)
 
   useEffect(() => {
@@ -14,7 +16,10 @@ export function useRobotSource() {
     loadLayout().then((layout) => {
       if (cancelled) return
       source = new StaticSource(layout)
-      source.setPaused(useDashboard.getState().paused)
+      const st = useDashboard.getState()
+      source.setPaused(st.paused)
+      source.setManual(st.mode === 'manual')
+      source.setCommand(st.command)
       source.start((snap) => useDashboard.getState().setSnapshot(snap.pose, snap.telemetry))
       sourceRef.current = source
     }).catch(console.error)
@@ -22,4 +27,6 @@ export function useRobotSource() {
   }, [])
 
   useEffect(() => { sourceRef.current?.setPaused(paused) }, [paused])
+  useEffect(() => { sourceRef.current?.setManual(manual) }, [manual])
+  useEffect(() => { sourceRef.current?.setCommand(command) }, [command])
 }

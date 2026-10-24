@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Pose, Telemetry } from '../data/source'
+import type { DriveCommand, Pose, Telemetry } from '../data/source'
 
 export type ViewId = 'map' | 'camera'
 export type Mode = 'auto' | 'manual'
@@ -10,11 +10,13 @@ interface DashboardState {
   paused: boolean
   zoom: number
   pose: Pose | null
+  command: DriveCommand
   goal: [number, number] | null
   goalArmed: boolean
   telemetry: Telemetry
   setSnapshot: (pose: Pose, telemetry: Telemetry) => void
   setMode: (mode: Mode) => void
+  setCommand: (command: DriveCommand) => void
   toggleGoalArmed: () => void
   setGoal: (goal: [number, number]) => void
   initiate: () => void
@@ -29,6 +31,7 @@ export const useDashboard = create<DashboardState>((set) => ({
   paused: false,
   zoom: 0.2,
   pose: null,
+  command: { linear: 0, angular: 0 },
   goal: null,
   goalArmed: false,
   telemetry: { battery: 100, signal: 'Strong', failsafe: 'Okay', system: 'Okay' },
@@ -39,6 +42,7 @@ export const useDashboard = create<DashboardState>((set) => ({
       telemetry: (Object.keys(telemetry) as (keyof Telemetry)[]).every((k) => s.telemetry[k] === telemetry[k]) ? s.telemetry : telemetry,
     })),
   setMode: (mode) => set({ mode }),
+  setCommand: (command) => set({ command }),
   toggleGoalArmed: () => set((s) => ({ goalArmed: !s.goalArmed })),
   // Placing a goal disarms Quick Goal so a stray click afterwards does nothing.
   setGoal: (goal) => set({ goal, goalArmed: false }),
