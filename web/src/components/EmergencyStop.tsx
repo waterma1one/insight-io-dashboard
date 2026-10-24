@@ -1,9 +1,12 @@
+import { useDashboard } from '../state/store'
 import './estop.css'
 
-// TODO(user): latch semantics -- does E-stop force MANUAL, block INITIATE, require confirm to release?
-export function EmergencyStop({ onPress }: { onPress?: () => void }) {
+export function EmergencyStop() {
+  const estopped = useDashboard((s) => s.estopped)
+  const toggle = useDashboard((s) => s.toggleEstop)
   return (
-    <button className="estop" onClick={onPress} aria-label="Emergency stop">
+    <button className={`estop ${estopped ? 'is-latched' : ''}`} onClick={toggle} aria-pressed={estopped}
+      aria-label={estopped ? 'Emergency stop engaged, press to release' : 'Emergency stop'}>
       <svg viewBox="0 0 100 100" aria-hidden>
         <defs><path id="arc" d="M14 50a36 36 0 0172 0" /></defs>
         <circle cx="50" cy="50" r="48" fill="var(--estop-yellow)" />

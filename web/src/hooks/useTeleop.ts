@@ -5,7 +5,7 @@ import { commandFromDirs, dirForKey, type Dir } from './teleopCommand'
 // Held WASD keys and pad presses feed one set of directions; the set becomes the store's drive
 // command. Only active in MANUAL; leaving MANUAL or losing focus releases everything.
 export function useTeleop() {
-  const manual = useDashboard((s) => s.mode === 'manual')
+  const manual = useDashboard((s) => s.mode === 'manual' && !s.estopped)
   const held = useRef(new Set<Dir>())
 
   const publish = useCallback(() => useDashboard.getState().setCommand(commandFromDirs(held.current)), [])
